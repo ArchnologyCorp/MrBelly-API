@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    devs = ['Carlos', 'Teylor', 'Cleber', 'Leonardo']
+    devs = ['Carlos', 'Teylor', 'Cleber', 'Leonardo', 'Railson']
     print('Devs: {}'.format(json.dumps(devs)))
     print('Hello Word!')
-    return 'Hello World!'
+    return devs
