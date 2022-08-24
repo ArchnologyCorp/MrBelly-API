@@ -1,4 +1,3 @@
-from distutils.command.build import build
 import psycopg2
 from datetime import datetime
 
