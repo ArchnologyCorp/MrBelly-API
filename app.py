@@ -13,7 +13,7 @@ def auth():
     data = request.get_json()
     return login(data['user'], data['password'])
 
-@app.route('/debits', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH'])
+@app.route('/debits', methods=['GET', 'POST'])
 @validateToken
 def debitsEndPoint(user):
     print(user)
