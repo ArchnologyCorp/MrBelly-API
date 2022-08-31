@@ -12,6 +12,7 @@ def validateToken(f):
         token = request.headers.get('Authorization')
         if not token:
             return jsonify({'msg': 'Authorization não informado', 'data': []}), 401
+
         try:
             data = jwt.decode(token, 'pagueoaluguel', algorithms=['HS256'])
         except:
@@ -25,7 +26,7 @@ def login(phone, password):
     if not auth or not auth['phone'] or not auth['password']:
         return jsonify({'msg': 'Usuário ou senha incorretos'}), 401
 
-    token = jwt.encode({'user': auth['user'], 'exp':datetime.now() + timedelta(hours=12)}, 'pagueoaluguel')
-    return jsonify({'msg': 'Usuário autenticado com sucesso', 'phone': phone, 'token': token})
+    token = jwt.encode({'phone': phone, 'exp':datetime.now() + timedelta(hours=12)}, 'pagueoaluguel')
+    return jsonify({'msg': 'Usuário autenticado com sucesso', 'user': auth['user'], 'token': token})
 
     
