@@ -25,7 +25,7 @@ def login(phone, password):
     if not auth or not auth['phone'] or not auth['password']:
         return jsonify({'msg': 'Usuário ou senha incorretos'}), 401
 
-    token = jwt.encode({'phone': phone, 'exp':datetime.now() + timedelta(hours=12)}, 'pagueoaluguel')
+    token = jwt.encode({'user': auth['user'], 'exp':datetime.now() + timedelta(hours=12)}, 'pagueoaluguel')
     return jsonify({'msg': 'Usuário autenticado com sucesso', 'phone': phone, 'token': token})
 
     
