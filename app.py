@@ -11,7 +11,7 @@ def hello():
 @app.route('/auth', methods=['POST'])
 def auth():
     data = request.get_json()
-    return login(data['user'], data['password'])
+    return login(data['phone'], data['password'])
 
 @app.route('/debits', methods=['GET', 'POST'])
 @validateToken
