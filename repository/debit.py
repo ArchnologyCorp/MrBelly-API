@@ -2,12 +2,12 @@ from pydoc import resolve
 from repository.db import openConnection, psycopg2
 from helpers.json_helper import buildJson
 
-def getDebits():
+def getDebits(user):
     response = []
     try:
         conn = openConnection() 
         cur = conn.cursor()
-        cur.execute('SELECT * FROM tb_cobranca')
+        cur.execute(f'SELECT * FROM tb_cobranca WHERE id_usuario = {user}')
         users = cur.fetchall()
         response = buildJson({'id': 0, 'creation_date': None, 'updated_at': None, 'description': '', 'id_user': 0}, users)
             
@@ -16,12 +16,12 @@ def getDebits():
         print(error)
     return response
 
-def getDebit(id):
+def getDebit(id, user):
     response = {}
     try:
         conn = openConnection() 
         cur = conn.cursor()
-        cur.execute(f'SELECT * FROM tb_cobranca WHERE id = {int(id)}')
+        cur.execute(f'SELECT * FROM tb_cobranca WHERE id = {int(id)} and id_usuario = {user}')
         data = cur.fetchall()
         response = buildJson({'id': 0, 'creation_date': None, 'updated_at': None, 'description': '', 'id_user': 0}, data)[0]
         cur.close()
@@ -29,12 +29,12 @@ def getDebit(id):
         print(error)
     return response
 
-def postDebit(entity):
+def postDebit(entity, user):
     response = {}
     try:
         conn = openConnection() 
         cur = conn.cursor()
-        cur.execute(f'INSERT INTO tb_cobranca (descricao, id_usuario) VALUES(%s,%s) RETURNING id', (entity["description"], entity["id_user"]))
+        cur.execute(f'INSERT INTO tb_cobranca (descricao, id_usuario) VALUES(%s,%s) RETURNING id', (entity["description"], user))
         conn.commit()
         entity['id'] = int(cur.fetchone()[0])
         response = entity
@@ -48,7 +48,7 @@ def putDebit(id, entity):
     try:
         conn = openConnection() 
         cur = conn.cursor()
-        cur.execute(f'UPDATE tb_cobranca SET descricao = %s, id_usuario = %s, data_atualizacao = now() WHERE id = %s', (entity["description"], entity["id_user"],id))
+        cur.execute(f'UPDATE tb_cobranca SET descricao = %s, data_atualizacao = now() WHERE id = %s', (entity["description"], id))
         conn.commit()
         response = True
     except (Exception, psycopg2.DatabaseError) as error:
