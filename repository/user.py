@@ -4,8 +4,6 @@ from helpers.json_helper import buildJson
 def authLogin(phone, password):
     response = None
     try:
-        print(phone)
-        print(password)
         conn = openConnection() 
         cur = conn.cursor()
         cur.execute(f'SELECT * FROM tb_usuario WHERE numero_fone = %s and senha = %s', (f'55{phone}', password))

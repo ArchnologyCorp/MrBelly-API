@@ -17,9 +17,8 @@ def auth():
 @app.route('/debits', methods=['GET', 'POST'])
 @validateToken
 def debitsEndPoint(user):
-    print(user)
     if request.method == 'GET':
-        return repository.debit.getDebits(user['id'])
+        return json.dumps(repository.debit.getDebits(user['id']), indent=4)
     elif request.method == 'POST':
         debit = request.get_json()
         return repository.debit.postDebit(debit, user['id'])
@@ -98,7 +97,6 @@ def debitEndPoint(user, id):
 @app.route('/auth/user', methods=['GET'])
 @validateToken
 def authEndpoint(user):
-    print(user)
     if request.method == 'GET':
         return user
 
