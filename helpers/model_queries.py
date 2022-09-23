@@ -1,5 +1,4 @@
 import datetime
-from traceback import print_tb
 from enums.methods import Method 
 
 def addQuery(tableName, properties, values):
@@ -11,8 +10,8 @@ def editQuery(tableName, properties, values, param):
 def deleteQuery(tableName, param):
     return f'DELETE FROM {tableName} WHERE {param or "1 <> 1"}'
 
-def getQuery(tableName, properties= '*', alias = [], filter = ''):
-    return f'SELECT {mappingFields(properties, alias, Method.GET)} FROM {tableName} WHERE 1 = 1 AND {filter}'
+def getQuery(tableName, properties= '*', alias = [], filter = '', group = ''):
+    return f"SELECT {mappingFields(properties, alias, Method.GET)} FROM {tableName} WHERE 1 = 1 AND {filter} {group is not '' and f'GROUP BY {group}' or ''}"
 
 def mappingTypeValue(value):
     if type(value) is str:
@@ -27,9 +26,10 @@ def mappingFields(properties, values, type):
         if(type == Method.PUT):
             query.append(f'{prop} = {mappingTypeValue(values[index])}')
         else:
-            # Tratar ele, tá dodói
-            # query.append(f'{prop} as {prop}') 
-            query.append(f'{prop}') 
+            if len(values) > 0:
+                query.append(f'{prop} {values[index]}')
+            else:  
+                query.append(f'{prop}') 
     print(','.join(query))
     return ','.join(query)
     

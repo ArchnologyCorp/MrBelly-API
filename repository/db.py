@@ -1,7 +1,6 @@
 import psycopg2
 
 def openConnection():
-    print('Connecting to the PostgreSQL database...')
     conn = psycopg2.connect(
         host="ec2-3-223-242-224.compute-1.amazonaws.com", 
         database="dcusk4ojn43g3h",

@@ -1,7 +1,6 @@
-from pydoc import resolve
 from repository.db import openConnection, psycopg2
 from helpers.json_helper import buildJson
-from helpers.model_queries import editQuery, getQuery, addQuery
+from helpers.model_queries import *
 
 _tableName = 'tb_cobranca'
 
@@ -36,7 +35,7 @@ def postDebit(entity, user):
     try:
         conn = openConnection() 
         cur = conn.cursor()
-        cur.execute(addQuery(tableName='tb_cobranca', properties=['descricao, id_usuario'], values=(entity["description"], user)))
+        cur.execute(addQuery(tableName=_tableName, properties=['descricao, id_usuario'], values=(entity["description"], user)))
         conn.commit()
         entity['id'] = int(cur.fetchone()[0])
         response = entity
@@ -62,7 +61,7 @@ def deleteDebit(id):
     try:
         conn = openConnection() 
         cur = conn.cursor()
-        cur.execute(f'DELETE FROM tb_cobranca WHERE id = {int(id)}')
+        cur.execute(deleteQuery(tableName=_tableName, param=f'id = {int(id)}'))
         conn.commit()
         response = True
     except (Exception, psycopg2.DatabaseError) as error:
