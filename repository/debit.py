@@ -23,16 +23,16 @@ def getDebits(user):
             currentDebit = next(item for item in response if item["id"] == debit["id"])
             if not 'debtors' in currentDebit:
                 currentDebit['debtors'] = [] 
-                currentDebit['debtors'].append({'id': debit['debtor_id'], 'name': debit['debtor_name'], 'amount': debit['amount_value']})
-                is_duplicate = any(single_debit["id"] == debit["id"] or "id" in debits for single_debit in debits)
-                if not is_duplicate:
-                    debits.append({
-                        'id': debit['id'],
-                        'creation_date': debit['creation_date'],
-                        'updated_at': debit['updated_at'],
-                        'description': debit['description'],
-                        'debtors': currentDebit['debtors']
-                    })
+            currentDebit['debtors'].append({'id': debit['debtor_id'], 'name': debit['debtor_name'], 'amount': debit['amount_value']})
+            is_duplicate = any(single_debit["id"] == debit["id"] or "id" in debits for single_debit in debits)
+            if not is_duplicate:
+                debits.append({
+                    'id': debit['id'],
+                    'creation_date': debit['creation_date'],
+                    'updated_at': debit['updated_at'],
+                    'description': debit['description'],
+                    'debtors': currentDebit['debtors']
+                })
         
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
