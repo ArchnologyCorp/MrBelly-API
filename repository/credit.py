@@ -159,5 +159,17 @@ def patchReceived(received, id, user):
         print(error)
     return response
 
+def deleteCreditByDebit(id):
+    response = False
+    try:
+        conn = openConnection() 
+        cur = conn.cursor()
+        cur.execute(deleteQuery(tableName=_tableName, param=f'id_cobranca = {int(id)}'))
+        conn.commit()
+        response = True
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    return response
+
 def getPropertiesByProperties(entity, properties):
     return [entity[value] for value in properties]

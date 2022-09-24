@@ -38,6 +38,9 @@ def debitEndPoint(user, id):
         debit = request.get_json()
         repository.debit.putDebit(id, debit)
         return sucessResponse()
+    elif request.method == 'DELETE':
+        repository.debit.deleteDebit(id)
+        return sucessResponse()
 
 @app.route('/credit/<id>', methods=['GET'])
 @validateToken

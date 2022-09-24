@@ -1,6 +1,6 @@
 from queue import Empty
 from repository.db import openConnection, psycopg2
-from repository.credit import postCredit
+from repository.credit import deleteCreditByDebit, postCredit
 from helpers.json_helper import buildJson
 from helpers.sql import *
 
@@ -100,6 +100,7 @@ def putDebit(id, entity):
 def deleteDebit(id):
     response = False
     try:
+        deleteCreditByDebit(id)
         conn = openConnection() 
         cur = conn.cursor()
         cur.execute(deleteQuery(tableName=_tableName, param=f'id = {int(id)}'))
