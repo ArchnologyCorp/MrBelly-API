@@ -14,17 +14,20 @@ def getDebits(user):
         cur.execute(getQuery(tableName=f'''{_tableName} Cobr 
                                         INNER JOIN tb_devedor Dv ON Dv.id_cobranca = Cobr.id
                                         INNER JOIN tb_usuario Dev ON Dev.id = Dv.id_usuario 
-                                        INNER JOIN tb_usuario Cob ON Cob.id = Cobr.id_usuario''', properties=['Cobr.id', 'Cobr.data_criacao', 'Cobr.data_atualizacao', 'Cobr.descricao', 'Dev.id', 'Dev.nome', 'Dv.valor'], filter=f'Cobr.id_usuario = {user}'))
+                                        INNER JOIN tb_usuario Cob ON Cob.id = Cobr.id_usuario''', properties=['Cobr.id', 'Cobr.data_criacao', 'Cobr.data_atualizacao', 'Cobr.descricao', 'Dev.id', 'Dev.nome', 'Dv.valor', 'Dv.data_cobranca', 'Dv.is_pago', 'Dv.is_recebido'], filter=f'Cobr.id_usuario = {user}'))
         users = cur.fetchall()
-        response = buildJson({'id': 0, 'creation_date': None, 'updated_at': None, 'description': '', 'debtor_id': 0, 'debtor_name': '', 'amount_value': 0.0}, users)
+        response = buildJson({'id': 0, 'creation_date': None, 'updated_at': None, 'description': '', 'debtor_id': 0, 'debtor_name': '', 'amount_value': 0.0, 'credit_date': None, 'is_paid_out': False, 'is_debited': False}, users)
         debits = []
 
         for debit in response:
             currentDebit = next(item for item in response if item["id"] == debit["id"])
+            
             if not 'debtors' in currentDebit:
                 currentDebit['debtors'] = [] 
-            currentDebit['debtors'].append({'id': debit['debtor_id'], 'name': debit['debtor_name'], 'amount': debit['amount_value']})
+                
+            currentDebit['debtors'].append({'id': debit['debtor_id'], 'name': debit['debtor_name'], 'amount': debit['amount_value'], 'credit_date': debit['credit_date'], 'is_paid_out': debit['is_paid_out'], 'is_debited': debit['is_debited']})
             is_duplicate = any(single_debit["id"] == debit["id"] or "id" in debits for single_debit in debits)
+
             if not is_duplicate:
                 debits.append({
                     'id': debit['id'],
