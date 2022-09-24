@@ -1,5 +1,5 @@
 from traceback import print_tb
-import repository.debit, repository.user
+import repository.debit, repository.credit, repository.user
 from flask import Flask, request, jsonify
 from auth import validateToken, login
 from helpers.response_helper import *
@@ -39,13 +39,32 @@ def debitEndPoint(user, id):
         debit = request.get_json()
         repository.debit.putDebit(id, debit)
         return sucessResponse()
-    elif request.method == 'DELETE':
-        repository.debit.deleteDebit(id)
-        return sucessResponse()
 
 # CARLOS
+@app.route('/credit/<id>', methods=['GET'])
+@validateToken
+def debitEndPoint(user, id):
+    return sucessResponse(repository.credit.getCredit(id, user['id']))
 
+@app.route('/credits', methods=['GET'])
+@validateToken
+def debitEndPoint(user):
+    return sucessResponse(repository.credit.getCredits(user))
+    
 
+@app.route('/credits/IPad/<id>', methods=['PATCH'])
+@validateToken
+def debitEndPoint(id):
+        debit = request.get_json()
+        repository.credit.patchPay(id, debit)
+        return sucessResponse()
+
+@app.route('/credits/IReceived/<pay>/<id>', methods=['PATCH'])
+@validateToken
+def debitEndPoint(received, id):
+        debit = request.get_json()
+        repository.credit.patchReceived(received, id, debit)
+        return sucessResponse()
 
 
 

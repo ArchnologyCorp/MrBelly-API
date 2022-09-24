@@ -28,8 +28,14 @@ def mappingFields(properties, values, type):
         else:
             if len(values) > 0:
                 query.append(f'{prop} {values[index]}')
-            else:  
+            else:
                 query.append(f'{prop}') 
-    print(','.join(query))
     return ','.join(query)
     
+def createProperties(tupleFields, arrayTables):
+    array = []
+    for table in arrayTables:
+        for fields in tupleFields:
+            for field in fields:
+                array.append(f'{f"{table}." if table != "" else ""}{field}')
+    return array

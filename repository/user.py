@@ -1,6 +1,6 @@
 from repository.db import openConnection, psycopg2
 from helpers.json_helper import buildJson
-from helpers.model_queries import *
+from helpers.sql import *
 
 def authLogin(phone, password):
     response = None
