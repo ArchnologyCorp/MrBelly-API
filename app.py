@@ -68,6 +68,7 @@ def changePayReceivement(user, received, id):
 @validateToken
 def authEndpoint(user):
     if request.method == 'GET':
+        print(type(sucessResponse()))
         return sucessResponse(user, 'Usuário resgatado com sucesso')
 
 @app.route('/user', methods=['POST'])
