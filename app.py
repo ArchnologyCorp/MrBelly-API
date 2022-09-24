@@ -51,16 +51,14 @@ def getCredits(user):
     
 @app.route('/credits/IPad/<id>', methods=['PATCH'])
 @validateToken
-def changePayment(id):
-        debit = request.get_json()
-        repository.credit.patchPay(id, debit)
+def changePayment(user, id):
+        repository.credit.patchPay(id, user['id'])
         return sucessResponse()
 
-@app.route('/credits/IReceived/<pay>/<id>', methods=['PATCH'])
+@app.route('/credits/IReceived/<received>/<id>', methods=['PATCH'])
 @validateToken
-def changePayReceivement(received, id):
-        debit = request.get_json()
-        repository.credit.patchReceived(received, id, debit)
+def changePayReceivement(user, received, id):
+        repository.credit.patchReceived(received, id, user['id'])
         return sucessResponse()
 
 @app.route('/auth/user', methods=['GET'])
@@ -93,9 +91,9 @@ def totalUser(user):
         debtors = []
         for transaction in transactions:
             if transaction['id_debtor'] is not user['id']:
-                debtors.append({'name': transaction['debtor'], 'amount': float(transaction['total'])})
+                debtors.append({'name': transaction['debtor'], 'amount': transaction['total']})
             else: 
-                collectors.append({'name': transaction['collector'], 'amount': float(transaction['total'])})
+                collectors.append({'name': transaction['collector'], 'amount': transaction['total']})
 
         return sucessResponse({'debtors': debtors, 'collectors': collectors}, 'Totalizadores calculados com sucesso')
 

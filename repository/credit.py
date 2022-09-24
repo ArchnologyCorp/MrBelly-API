@@ -1,6 +1,7 @@
 from repository.db import openConnection, psycopg2
 from helpers.json_helper import buildJson
 from utils.array import removeByList
+from utils.dict import removeByDict
 from helpers.sql import *
 from datetime import datetime
 
@@ -27,7 +28,7 @@ _defaultPropertiesObj = {
     'observation': '',
     'is_paid_out': False,
     'is_debited': False,
-    'id_credit': 0,
+    'id_debit': 0,
     'id_user': 0}
 
 _properties = _defaultPropertiesObj.keys()
@@ -51,10 +52,24 @@ def getCredits(user):
         cur = conn.cursor()
         cur.execute(getQuery(tableName=sql, properties=_properties_, filter=f'cred.id_usuario = {user}'))
         credits = cur.fetchall()
-        
+
         _propertiesObj.update({
             'description': '', 'id_user_debit': 0, 'name_user_debit': ''})
         response = buildJson(_propertiesObj, credits)
+
+        for credit in response:
+            credit.update({
+                'debit':{
+                    'id': credit['id_debit'],
+                    'description': credit['description'],
+                    'collector':{
+                        'id': credit['id_user_debit'],
+                        'name': credit['name_user_debit'],
+                    },
+                }
+            }) 
+            removeByDict(credit, ['id_user', 'id_debit', 'description', 'id_user_debit','name_user_debit'])
+
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
@@ -81,6 +96,19 @@ def getCredit(id, user):
         _propertiesObj.update({
             'description': '', 'id_user_debit': 0, 'name_user_debit': ''})
         response = buildJson(_propertiesObj, data)[0]
+ 
+        response.update({
+            'debit':{
+                'id': response['id_debit'],
+                'description': response['description'],
+                'collector':{
+                    'id': response['id_user_debit'],
+                    'name': response['name_user_debit'],
+                },
+            }
+        })
+
+        removeByDict(response, ['id_user', 'id_debit', 'description', 'id_user_debit','name_user_debit'])
 
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
