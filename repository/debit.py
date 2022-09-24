@@ -1,4 +1,6 @@
+from queue import Empty
 from repository.db import openConnection, psycopg2
+from repository.credit import postCredit
 from helpers.json_helper import buildJson
 from helpers.sql import *
 
@@ -9,26 +11,60 @@ def getDebits(user):
     try:
         conn = openConnection() 
         cur = conn.cursor()
-        cur.execute(getQuery(tableName=f'{_tableName} cobr INNER JOIN tb_usuario usu ON cobr.id_usuario = usu.id', properties=['cobr.id', 'cobr.data_criacao', 'cobr.data_atualizacao', 'cobr.descricao', 'usu.id', 'usu.nome'], filter=f'id_usuario = {user}'))
+        cur.execute(getQuery(tableName=f'''{_tableName} Cobr 
+                                        INNER JOIN tb_devedor Dv ON Dv.id_cobranca = Cobr.id
+                                        INNER JOIN tb_usuario Dev ON Dev.id = Dv.id_usuario 
+                                        INNER JOIN tb_usuario Cob ON Cob.id = Cobr.id_usuario''', properties=['Cobr.id', 'Cobr.data_criacao', 'Cobr.data_atualizacao', 'Cobr.descricao', 'Dev.id', 'Dev.nome', 'Dv.valor'], filter=f'Cobr.id_usuario = {user}'))
         users = cur.fetchall()
-        response = buildJson({'id': 0, 'creation_date': None, 'updated_at': None, 'description': '', 'id_user': 0, 'name_user': ''}, users)
+        response = buildJson({'id': 0, 'creation_date': None, 'updated_at': None, 'description': '', 'debtor_id': 0, 'debtor_name': '', 'amount_value': 0.0}, users)
+        debits = []
+
+        for debit in response:
+            currentDebit = next(item for item in response if item["id"] == debit["id"])
+            if not 'debtors' in currentDebit:
+                currentDebit['debtors'] = [] 
+                currentDebit['debtors'].append({'id': debit['debtor_id'], 'name': debit['debtor_name'], 'amount': float(debit['amount_value'])})
+                is_duplicate = any(single_debit["id"] == debit["id"] or "id" in debits for single_debit in debits)
+                if not is_duplicate:
+                    debits.append({
+                        'id': debit['id'],
+                        'creation_date': debit['creation_date'],
+                        'updated_at': debit['updated_at'],
+                        'description': debit['description'],
+                        'debtors': currentDebit['debtors']
+                    })
+        
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-    return response
+    return debits
 
 def getDebit(id, user):
     response = {}
     try:
         conn = openConnection() 
         cur = conn.cursor()
-        cur.execute(getQuery(tableName=_tableName, filter=f'id = {int(id)} and id_usuario = {user}'))
+        cur.execute(getQuery(tableName=f'''{_tableName} Cobr 
+                                        INNER JOIN tb_devedor Dv ON Dv.id_cobranca = Cobr.id
+                                        INNER JOIN tb_usuario Dev ON Dev.id = Dv.id_usuario 
+                                        INNER JOIN tb_usuario Cob ON Cob.id = Cobr.id_usuario''', properties=['Cobr.id', 'Cobr.data_criacao', 'Cobr.data_atualizacao', 'Cobr.descricao', 'Dev.id', 'Dev.nome', 'Dv.valor'], filter=f'Cobr.id = {int(id)} and Cobr.id_usuario = {user}'))
         data = cur.fetchall()
-        response = buildJson({'id': 0, 'creation_date': None, 'updated_at': None, 'description': '', 'id_user': 0}, data)[0]
+        response = buildJson({'id': 0, 'creation_date': None, 'updated_at': None, 'description': '', 'debtor_id': 0, 'debtor_name': '', 'amount_value': 0.0}, data)
+        
+        debtors = []
+        for debit in response:
+            debtors.append({'id': debit['debtor_id'], 'name': debit['debtor_name'], 'amount': float(debit['amount_value'])})
+        
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-    return response
+    return {
+        'id': debit['id'],
+        'creation_date': debit['creation_date'],
+        'updated_at': debit['updated_at'],
+        'description': debit['description'],
+        'debtors': debtors
+    }
 
 def postDebit(entity, user):
     response = {}
@@ -38,6 +74,11 @@ def postDebit(entity, user):
         cur.execute(addQuery(tableName=_tableName, properties=['descricao, id_usuario'], values=(entity["description"], user)))
         conn.commit()
         entity['id'] = int(cur.fetchone()[0])
+        for credit in entity["credits"]:
+            credit["id_credit"] = entity['id']
+            credit["is_debited"] = False
+            credit["is_paid_out"] = False
+            postCredit(credit)
         response = entity
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:

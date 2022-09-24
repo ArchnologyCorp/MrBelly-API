@@ -34,8 +34,7 @@ def mappingFields(properties, values, type):
     
 def createProperties(tupleFields, arrayTables):
     array = []
-    for table in arrayTables:
-        for fields in tupleFields:
-            for field in fields:
-                array.append(f'{f"{table}." if table != "" else ""}{field}')
+    for index, fields in enumerate(tupleFields):
+        for field in fields:
+            array.append(f'{f"{arrayTables[index]}." if arrayTables[index] != "" else ""}{field}')
     return array

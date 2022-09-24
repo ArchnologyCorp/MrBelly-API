@@ -1,4 +1,3 @@
-from traceback import print_tb
 import repository.debit, repository.credit, repository.user
 from flask import Flask, request, jsonify
 from auth import validateToken, login
@@ -40,86 +39,30 @@ def debitEndPoint(user, id):
         repository.debit.putDebit(id, debit)
         return sucessResponse()
 
-# CARLOS
 @app.route('/credit/<id>', methods=['GET'])
 @validateToken
-def debitEndPoint(user, id):
+def getCreditById(user, id):
     return sucessResponse(repository.credit.getCredit(id, user['id']))
 
 @app.route('/credits', methods=['GET'])
 @validateToken
-def debitEndPoint(user):
-    return sucessResponse(repository.credit.getCredits(user))
+def getCredits(user):
+    return sucessResponse(repository.credit.getCredits(user['id']))
     
-
 @app.route('/credits/IPad/<id>', methods=['PATCH'])
 @validateToken
-def debitEndPoint(id):
+def changePayment(id):
         debit = request.get_json()
         repository.credit.patchPay(id, debit)
         return sucessResponse()
 
 @app.route('/credits/IReceived/<pay>/<id>', methods=['PATCH'])
 @validateToken
-def debitEndPoint(received, id):
+def changePayReceivement(received, id):
         debit = request.get_json()
         repository.credit.patchReceived(received, id, debit)
         return sucessResponse()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# LEONARDO 
 @app.route('/auth/user', methods=['GET'])
 @validateToken
 def authEndpoint(user):

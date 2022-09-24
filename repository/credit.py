@@ -6,7 +6,7 @@ from datetime import datetime
 
 _tableName = 'tb_devedor'
 
-_propertiesSQl = [
+_defaultPropertiesSQl = [
     'id',
     'data_criacao',
     'data_atualizacao',
@@ -18,7 +18,7 @@ _propertiesSQl = [
     'id_cobranca',
     'id_usuario']
 
-_propertiesObj = {
+_defaultPropertiesObj = {
     'id': 0,
     'creation_date': datetime.today(),
     'updated_at': None,
@@ -30,26 +30,31 @@ _propertiesObj = {
     'id_credit': 0,
     'id_user': 0}
 
-_properties = _propertiesObj.keys()
+_properties = _defaultPropertiesObj.keys()
 
 
 def getCredits(user):
     response = []
+    _propertiesSQl = _defaultPropertiesSQl.copy()
+    _propertiesObj = _defaultPropertiesObj.copy()
+
     try:
         sql = f'''{_tableName} cred 
-                INNER JOIN tb_cobranca debit ON debit.id = cred.id_cobranca
-                INNER JOIN tb_usuario usu ON usuD.id = debit.id_usuario 
-                INNER JOIN tb_usuario usu ON usuC.id = cred.id_usuario 
+                INNER JOIN tb_cobranca cobr ON cobr.id = cred.id_cobranca
+                INNER JOIN tb_usuario usuD ON usuD.id = cobr.id_usuario 
                 '''
+
         _properties_ = createProperties(
-            [_propertiesSQl, ['id', 'nome'], ['id', 'nome']], ['cobr', 'usuC', 'usuD'])
+            [_propertiesSQl, ['descricao'], ['id', 'nome']], ['cred', 'cobr', 'usuD'])
 
         conn = openConnection()
         cur = conn.cursor()
-        cur.execute(getQuery(tableName=sql, properties=_properties_, filter=f'id_usuario = {user}'))
+        cur.execute(getQuery(tableName=sql, properties=_properties_, filter=f'cred.id_usuario = {user}'))
         credits = cur.fetchall()
-        response = buildJson(_propertiesObj.update({
-            'id_user_credit': 0, 'name_user_credit': '', 'id_user_debit': 0, 'name_user_debit': ''}), credits)
+        
+        _propertiesObj.update({
+            'description': '', 'id_user_debit': 0, 'name_user_debit': ''})
+        response = buildJson(_propertiesObj, credits)
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
@@ -58,38 +63,42 @@ def getCredits(user):
 
 def getCredit(id, user):
     response = {}
+    _propertiesSQl = _defaultPropertiesSQl.copy()
+    _propertiesObj = _defaultPropertiesObj.copy()
     try:
         sql = f'''{_tableName} cred 
-                INNER JOIN tb_cobranca debit ON debit.id = cred.id_cobranca
-                INNER JOIN tb_usuario usu ON usuD.id = debit.id_usuario 
-                INNER JOIN tb_usuario usu ON usuC.id = cred.id_usuario 
+                INNER JOIN tb_cobranca cobr ON cobr.id = cred.id_cobranca
+                INNER JOIN tb_usuario usuD ON usuD.id = cobr.id_usuario 
                 '''
         _properties_ = createProperties(
-            [_propertiesSQl, ['id', 'nome'], ['id', 'nome']], ['cobr', 'usuC', 'usuD'])
+            [_propertiesSQl, ['descricao'], ['id', 'nome']], ['cred', 'cobr', 'usuD'])
 
         conn = openConnection()
         cur = conn.cursor()
         cur.execute(getQuery(
             tableName=sql, properties=_properties_, filter=f'cred.id = {int(id)} and cred.id_usuario = {user}'))
         data = cur.fetchall()
-        response = buildJson(_propertiesObj.update({
-            'id_user_credit': 0, 'name_user_credit': '', 'id_user_debit': 0, 'name_user_debit': ''}), data)[0]
+        _propertiesObj.update({
+            'description': '', 'id_user_debit': 0, 'name_user_debit': ''})
+        response = buildJson(_propertiesObj, data)[0]
+
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
     return response
 
 
-def postDebit(entity):
+def postCredit(entity):
     response = {}
+    _propertiesSQl = _defaultPropertiesSQl.copy()
     try:
         _properties_ = removeByList(
             _propertiesSQl, ['id', 'data_criacao', 'data_atualizacao'])
-
+    
         conn = openConnection()
         cur = conn.cursor()
         cur.execute(addQuery(tableName=_tableName, properties=_properties_, values=getPropertiesByProperties(
-            entity, removeByList(_properties, ['id', 'creation_date', 'updated_at']))))
+            entity, removeByList(list(_properties), ['id', 'creation_date', 'updated_at']))))
         conn.commit()
         entity['id'] = int(cur.fetchone()[0])
         response = entity
