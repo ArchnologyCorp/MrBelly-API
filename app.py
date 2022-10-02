@@ -95,9 +95,9 @@ def totalUser(user):
         debtors = []
         for transaction in transactions:
             if transaction['id_debtor'] is not user['id']:
-                debtors.append({'name': transaction['debtor'], 'amount': transaction['total']})
+                debtors.append({'name': transaction['debtor'], 'amount': transaction['total'], 'pending_amount': transaction['pending_total']})
             else: 
-                collectors.append({'name': transaction['collector'], 'amount': transaction['total']})
+                collectors.append({'name': transaction['collector'], 'amount': transaction['total'], 'pending_amount': transaction['pending_total']})
 
         return sucessResponse({'debtors': debtors, 'collectors': collectors}, 'Totalizadores calculados com sucesso')
 

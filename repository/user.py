@@ -48,12 +48,12 @@ def totalByUser(id):
         conn = openConnection() 
         cur = conn.cursor()
         cur.execute(getQuery(tableName=f'tb_cobranca CB INNER JOIN tb_devedor DV ON CB.id = dv.id_cobranca INNER JOIN tb_usuario Cob ON Cob.id = CB.id_usuario INNER JOIN tb_usuario Dev ON Dev.id = DV.id_usuario', 
-                            properties=['Dev.id', 'Cob.id', 'Dev.nome', 'Cob.nome', 'SUM(DV.valor)'], 
-                            alias=['id_devedor', 'id_cobrador', 'devedor', 'cobrador', 'total'], 
+                            properties=['Dev.id', 'Cob.id', 'Dev.nome', 'Cob.nome', 'SUM(DV.valor)', 'SUM(CASE WHEN  DV.is_pago = false THEN DV.Valor ELSE 0 END)'], 
+                            alias=['id_devedor', 'id_cobrador', 'devedor', 'cobrador', 'total', 'total_pendente'], 
                             filter=f'Cob.id = {id} OR Dev.id = {id}',
                             group='Dev.Id, Dev.nome, Cob.Id, Cob.nome'))
         tot = cur.fetchall()
-        response = buildJson({'id_debtor': 0, 'id_collector': 0, 'debtor': '', 'collector': '', 'total': 0}, tot)
+        response = buildJson({'id_debtor': 0, 'id_collector': 0, 'debtor': '', 'collector': '', 'total': 0, 'pending_total': 0}, tot)
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
