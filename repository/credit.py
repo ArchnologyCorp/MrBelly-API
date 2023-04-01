@@ -28,7 +28,7 @@ _defaultPropertiesObj = {
     'observation': '',
     'is_paid_out': False,
     'is_debited': False,
-    'id_debit': 0,
+    'id_credit': 0,
     'id_user': 0}
 
 _properties = _defaultPropertiesObj.keys()
@@ -73,6 +73,9 @@ def getCredits(user):
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+        
+    finally:
+        conn.close()
     return response
 
 
@@ -113,6 +116,9 @@ def getCredit(id, user):
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+        
+    finally:
+        conn.close()
     return response
 
 
@@ -133,6 +139,8 @@ def postCredit(entity):
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+    finally:
+        conn.close()
     return response
 
 def patchPay(id, user):
@@ -145,6 +153,8 @@ def patchPay(id, user):
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+    finally:
+        conn.close()
     return response
 
 def patchReceived(received, id, user):
@@ -157,6 +167,8 @@ def patchReceived(received, id, user):
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+    finally:
+        conn.close()
     return response
 
 def deleteCreditByDebit(id):
@@ -169,6 +181,9 @@ def deleteCreditByDebit(id):
         response = True
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+    
+    finally:
+        conn.close()
     return response
 
 def getPropertiesByProperties(entity, properties):

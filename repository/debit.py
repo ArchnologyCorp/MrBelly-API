@@ -40,7 +40,11 @@ def getDebits(user):
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+        
+    finally:
+        conn.close()
     return debits
+
 
 def getDebit(id, user):
     response = {}
@@ -61,6 +65,9 @@ def getDebit(id, user):
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+        
+    finally:
+        conn.close()
     return {
         'id': debit['id'],
         'creation_date': debit['creation_date'],
@@ -68,6 +75,7 @@ def getDebit(id, user):
         'description': debit['description'],
         'debtors': debtors
     }
+
 
 def postDebit(entity, user):
     response = {}
@@ -86,6 +94,9 @@ def postDebit(entity, user):
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+        
+    finally:
+        conn.close()
     return response
 
 def putDebit(id, entity):

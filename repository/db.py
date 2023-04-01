@@ -6,4 +6,4 @@ def openConnection():
         database="bbio43cxsc7culcqqqnp",
         user="ugfhyj2ph23mx4h4rohn",
         password="J7685ISIeik3iWJTkEJOxqK1wqVdqK")
-    return conn
+    return conn    

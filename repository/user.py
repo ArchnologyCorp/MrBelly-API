@@ -13,6 +13,9 @@ def authLogin(phone, password):
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+        
+    finally:
+        conn.close()
     return response
 
 def postUser(entity):
@@ -27,6 +30,9 @@ def postUser(entity):
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+        
+    finally:
+        conn.close()
     return response
 
 def putUser(entity, id):
@@ -40,6 +46,9 @@ def putUser(entity, id):
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+        
+    finally:
+        conn.close()
     return response
 
 def totalByUser(id):
@@ -57,4 +66,7 @@ def totalByUser(id):
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+        
+    finally:
+        conn.close()
     return response
