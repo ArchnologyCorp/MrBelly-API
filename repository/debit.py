@@ -86,7 +86,7 @@ def postDebit(entity, user):
         conn.commit()
         entity['id'] = int(cur.fetchone()[0])
         for credit in entity["credits"]:
-            credit["id_credit"] = entity['id']
+            credit["id_debit"] = entity['id']
             credit["is_debited"] = False
             credit["is_paid_out"] = False
             postCredit(credit)

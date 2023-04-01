@@ -28,7 +28,7 @@ _defaultPropertiesObj = {
     'observation': '',
     'is_paid_out': False,
     'is_debited': False,
-    'id_credit': 0,
+    'id_debit': 0,
     'id_user': 0}
 
 _properties = _defaultPropertiesObj.keys()
